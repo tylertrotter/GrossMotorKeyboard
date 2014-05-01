@@ -1,0 +1,502 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foundation</title>
+    <link rel="stylesheet" href="css/app.css" />
+    <script src="bower_components/modernizr/modernizr.js"></script>
+      <style>
+        body{
+            text-align: center;
+            font-size: 200%;
+        }
+        #left .row,
+        #right .row{
+            padding: 50px 0;
+        }
+          #output{
+              font-size: 300%;
+          }
+      </style>
+  </head>
+  <body>
+    <div class="row">
+        <div id="left" class="small-6 large-6 columns">
+            <div class="row">
+                <div class="small-12 large-12 columns">symbols</div>
+            </div>
+            <div class="row">
+                <div class="small-4 large-4 columns">back</div>
+                <div class="small-4 large-4 columns">vowels</div>
+                <div class="small-4 large-4 columns">send</div>
+            </div>
+            <div class="row">
+                <div class="small-12 large-12 columns">consonants</div>
+            </div>
+        </div>
+        
+        <div id="right" class="small-6 large-6 columns">
+            <div class="row">
+                <div id="slot1" class="small-12 large-12 columns">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div id="slot4" class="small-4 large-4 columns">&nbsp;</div>
+                <div id="slot0" class="small-4 large-4 columns">space</div>
+                <div id="slot2" class="small-4 large-4 columns">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div id="slot3" class="small-12 large-12 columns">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+      <div id="output"></div>
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/foundation/js/foundation.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        var swipe = [];
+        var place = [];
+        swipeDelay = '';
+            
+        $(document).keydown(function(e){
+            e.preventDefault();
+            
+            // Add the key zone each time a key is pressed to the
+            // swipe array.
+            swipe.push(getKeyZone(e))//, new Date().getTime());
+            clearTimeout(swipeDelay);
+            
+            // If the swipe array has accumulated more than 3 key presses
+            // in less than .4 seconds, it is probably a swipe, otherwise 
+            // it is a tap. 
+            swipeDelay = setTimeout(function(){ 
+                if(swipe.length > 3){
+                    convertToMovement(swipe, false);
+                }else{
+                    convertToMovement(swipe, true);
+                }
+                swipe = [];
+            }, 400);
+            
+        });
+        
+        function getKeyZone(e){
+            /*  Return a number for the X and Y zone of the keyboard. E.g. The top function keys
+                are in the 0 Y zone while the spacebar is in the 5 zone. The escape key would be
+                in the 0 Y zone and the 0 X zone. The return key would be in the 13 X zone. This
+                might not work on all keyboards, I've only tested on my MacBook Pro.
+            */
+            var key = e.which;
+            var coords = [];
+            console.log(key)
+            // X
+            if(key === 27 || key === 192 || key === 9 || key === 20){
+               coords[0] = 0;
+            }else if(key === 112 || key === 49 || key === 81 || key === 17){
+               coords[0] = 1;
+            }else if(key === 113 || key === 50 || key === 65 || key === 90 || key === 87){
+               coords[0] = 2;
+            }else if(key === 114 || key === 51 || key === 83 || key === 91 || key === 88 || key === 69){
+               coords[0] = 3;
+            }else if(key === 115 || key === 52 || key === 68 || key === 67 || key === 82){
+               coords[0] = 4;
+            }else if(key === 116 || key === 53 || key === 70 || key === 71 || key === 86 || key === 84){
+               coords[0] = 5;
+            }else if(key === 117 || key === 54 || key === 89 || key === 66){
+               coords[0] = 6;
+            }else if(key === 118 || key === 55 || key === 72 || key === 78 || key === 85){
+               coords[0] = 7;
+            }else if(key === 119 || key === 56 || key === 73 || key === 74 || key === 75 || key === 77){
+               coords[0] = 8;
+            }else if(key === 120 || key === 57 || key === 79 || key === 76 || key === 188 || key === 93){
+               coords[0] = 9;
+            }else if(key === 121 || key === 48 || key === 80 || key === 186 || key === 190){
+               coords[0] = 10;
+            }else if(key === 122 || key === 189 || key === 219 || key === 222 || key === 191 || key === 37){
+               coords[0] = 11;
+            }else if(key === 187 || key === 221 || key === 13 || key === 38 || key === 40){
+               coords[0] = 12;
+            }else if(key === 8 || key === 220 || key === 39){
+               coords[0] = 13;
+            }else if(key === 16){
+                if(e.originalEvent.keyLocation == 1){
+                    coords[0] = 0;
+                }else{
+                   coords[0] = 13; 
+                }
+            }else if(key === 18){
+                if(e.originalEvent.keyLocation == 1){
+                    coords[0] = 2;
+                }else{
+                   coords[0] = 10; 
+                }
+                
+            }
+            
+            // Y
+            if(key === 27 || (key >= 112 && key <= 121)){
+               coords[1] = 0;
+            }else if(key === 192 || (key >= 48 && key <= 57) || key === 189 || key === 187 || key === 8){
+               coords[1] = 1;
+            }else if(key === 81 || key === 87 || key === 69 || key === 82 || key === 84 || key === 9 ||
+                     key === 89 || key === 85 || key === 73 || key === 79 || key === 80 || key === 219 ||
+                     key === 221 || key === 220){
+               coords[1] = 2;
+            }else if(key === 65 || key === 83 || key === 68 || key === 70 || key === 71 || key === 72 || key === 20 ||
+                     key === 74 || key === 75 || key === 76 || key === 186 || key === 222 || key === 13){
+               coords[1] = 3;
+            }else if(key === 16 || key === 90 || key === 88 || key === 67 || key === 86 || key === 66 || key === 78 ||
+                     key === 77 || key === 188 || key === 190 || key === 191){
+               coords[1] = 4;
+            }else if(key === 17 || key === 18 || key === 91 || key === 31 || key === 32 || key === 93 ||
+                     key === 18 || key === 37 || key === 40 || key === 38 || key === 39){
+               coords[1] = 5;
+            }else{
+                return false;
+            }
+            return coords;
+        }
+        
+        // Almost all of the below code needs to be refactored.
+        function convertToMovement(swipe, tap){
+            if(tap){
+                var direction = 'tap';
+            }else{
+                var direction = getSwipeDirection(swipe);
+            }
+            if(getSwipeOrigin(swipe) === 'left'){
+                if(direction === 'tap'){
+                    leftTap();
+                }else if(direction === 'up'){
+                    leftUp();
+                }else if(direction === 'right'){
+                    leftRight();
+                }else if(direction === 'down'){
+                    leftDown();
+                }else if(direction === 'left'){
+                    leftLeft();
+                }
+            }else if(getSwipeOrigin(swipe) === 'right'){
+                if(direction === 'tap'){
+                    rightTap();
+                }else if(direction === 'up'){
+                    rightUp();
+                }else if(direction === 'right'){
+                    rightRight();
+                }else if(direction === 'down'){
+                    rightDown();
+                }else if(direction === 'left'){
+                    rightLeft();
+                }
+            }
+            
+            tryToOutput(place);
+        }
+        
+        function getSwipeOrigin(swipe){
+            if(!swipe[0]){
+                var origin = swipe[1][0];
+            }else{
+                var origin = swipe[0][0];
+            }
+
+            if(origin < 6){
+                return 'left';
+            }else if(origin >= 6 && origin <= 13){
+                return 'right';
+            }
+        }
+        
+        function getSwipeDirection(swipe){
+           if(swipe == 'tap'){
+                return 'tap'
+            }
+            var swipeX = [];
+            var swipeY = [];
+            for(var i = 0; i < swipe.length; i++){
+                swipeX[i] = swipe[i][0];
+                swipeY[i] = swipe[i][1];
+            }
+            
+            
+            
+            for(var f = 0; f < Math.floor(swipeY.length/2); f++){
+                var firstYZones =+ swipeY[f];
+            }
+            var firstYAvg = firstYZones/(Math.floor(swipeY.length/2));
+            for(var l = Math.ceil(swipeY.length/2); l < swipeY.length; l++){
+                var lastYZones =+ swipeY[l];
+            }
+            var lastYAvg = lastYZones/(Math.ceil(swipeY.length/2)); 
+            if(getDiff(swipeY[0], swipeY[swipeY.length-1]) > getDiff(swipeX[0], swipeX[swipeX.length-1])){
+                if(swipeY[0] > swipeY[swipeY.length-1]){
+                    return 'up'
+                }else{
+                    return 'down'
+                }
+            }
+            
+            
+            for(var f = 0; f < Math.floor(swipeX.length/2); f++){
+                var firstXZones =+ swipeX[f];
+            }swipeX
+            var firstXAvg = firstXZones/(Math.floor(swipeX.length/2));
+            for(var l = Math.ceil(swipeX.length/2); l < swipeX.length; l++){
+                var lastXZones =+ swipeX[l];
+            }
+            var lastXAvg = lastXZones/(Math.ceil(swipeX.length/2)); 
+            
+            if(swipeX[0] > swipeX[swipeX.length-1]){
+                return 'left'
+            }else{
+                return 'right'
+            }
+           
+            
+            function getDiff(a, b) { return Math.abs(a - b) }
+            
+        }
+        
+        
+        
+        function leftTap(){
+            place = [0];
+            console.log('leftTap')
+        }  
+        function leftUp(){
+            place = [1];
+            console.log('leftup')
+        }  
+        function leftRight(){
+            place = [2];
+            console.log('leftright')
+        }
+        function leftDown(){
+            place = [3];
+            console.log('leftdown')
+        }
+        function leftLeft(){
+            place = [4];
+            console.log('leftleft')
+        }
+        
+        function rightTap(){
+            place.push(5);
+            console.log('righttap')
+        }  
+        function rightUp(){
+            place.push(6);
+            console.log('rightup')
+        }  
+        function rightRight(){
+            place.push(7);
+            console.log('rightright')
+        }
+        function rightDown(){
+            place.push(8);
+            console.log('rightdown')
+        }
+        function rightLeft(){
+            place.push(9);
+            console.log('rightleft')
+        }
+        
+        function tryToOutput(place){
+            var output = $('#output').html();
+            
+            // Immediate Right Side
+            if(place.length === 1){
+                if(place[0] === 5){
+                    reallyOutput(output, '&bull;');
+                    return false;
+                }
+            }
+            
+            // Left Immediate
+            if(place.length === 1){
+                if(place[0] === 4){
+                    $('#output').html(output.substring(0, output.length-1));
+                    goToStart();
+                }else if(place[0] === 2){
+                    sendOutput();
+                    output = '';
+                    goToStart()
+                }
+            }
+            if(place[0] === 0 && place.length === 1){
+                // change interface
+                $('#slot0').html('a');
+                $('#slot1').html('e');
+                $('#slot2').html('i');
+                $('#slot3').html('o');
+                $('#slot4').html('u');
+            }
+            if(place[0] === 3  && place.length === 1){
+                // change interface
+                $('#slot0').html('b,c,d,f,g');
+                $('#slot1').html('h,j,k,l,m');
+                $('#slot2').html('n,p,q,r,s');
+                $('#slot3').html('t,v,w,x,y');
+                $('#slot4').html('z');
+            }
+            if(place[0] === 3 && place[1] === 5  && place.length === 2){
+                $('#slot0').html('b');
+                $('#slot1').html('c');
+                $('#slot2').html('d');
+                $('#slot3').html('f');
+                $('#slot4').html('g');
+            }
+            if(place[0] === 3 && place[1] === 6  && place.length === 2){
+                $('#slot0').html('h');
+                $('#slot1').html('j');
+                $('#slot2').html('k');
+                $('#slot3').html('l');
+                $('#slot4').html('m');
+            }
+            if(place[0] === 3 && place[1] === 7  && place.length === 2){
+                $('#slot0').html('n');
+                $('#slot1').html('p');
+                $('#slot2').html('q');
+                $('#slot3').html('r');
+                $('#slot4').html('s');
+            }
+            if(place[0] === 3 && place[1] === 8  && place.length === 2){
+                $('#slot0').html('t');
+                $('#slot1').html('v');
+                $('#slot2').html('w');
+                $('#slot3').html('x');
+                $('#slot4').html('y');
+            }
+            if(place[0] === 3 && place[1] === 9  && place.length === 2){
+                $('#slot0').html('z');
+            }
+            
+            
+            // Vowels
+            if(place[0] === 0 && place.length === 2){
+                
+                if(place[1] === 5){
+                    reallyOutput(output, 'a');
+                    return false;
+                }else if(place[1] === 6){
+                    reallyOutput(output, 'e');
+                    return false;
+                }else if(place[1] === 7){
+                    reallyOutput(output, 'i');
+                    return false;
+                }else if(place[1] === 8){
+                    reallyOutput(output, 'o');
+                    return false;
+                }else if(place[1] === 9){
+                    reallyOutput(output, 'u');
+                    return false;
+                }
+                goToStart();
+                place = [];
+            }else if(place[0] === 3 && place.length === 3){
+                if(place[1] === 5){
+                    if(place[2] === 5){
+                       reallyOutput(output, 'b');
+                        return false;
+                    }else if(place[2] === 6){
+                       reallyOutput(output, 'c');
+                        return false;
+                    }else if(place[2] === 7){
+                        reallyOutput(output, 'd');
+                        return false; 
+                    }else if(place[2] === 8){
+                      reallyOutput(output, 'f');
+                        return false; 
+                    }else if(place[2] === 9){
+                       reallyOutput(output, 'g');
+                        return false;  
+                    }
+                }else if(place[1] === 6){
+                    if(place[2] === 5){
+                       reallyOutput(output, 'h');
+                        return false; 
+                    }else if(place[2] === 6){
+                       reallyOutput(output, 'j');
+                        return false; 
+                    }else if(place[2] === 7){
+                       reallyOutput(output, 'k');
+                        return false; 
+                    }else if(place[2] === 8){
+                      reallyOutput(output, 'l');
+                        return false; 
+                    }else if(place[2] === 9){
+                       reallyOutput(output, 'm');
+                        return false; 
+                    }
+                }else if(place[1] === 7){
+                    if(place[2] === 5){
+                      reallyOutput(output, 'n');
+                        return false;  
+                    }else if(place[2] === 6){
+                       reallyOutput(output, 'p');
+                        return false; 
+                    }else if(place[2] === 7){
+                       reallyOutput(output, 'q');
+                        return false; 
+                    }else if(place[2] === 8){
+                       reallyOutput(output, 'r');
+                        return false; 
+                    }else if(place[2] === 9){
+                       reallyOutput(output, 's');
+                        return false;  
+                    }
+                }else if(place[1] === 8){
+                    if(place[2] === 5){
+                       reallyOutput(output, 't');
+                        return false; 
+                    }else if(place[2] === 6){
+                       reallyOutput(output, 'v');
+                        return false; 
+                    }else if(place[2] === 7){
+                       reallyOutput(output, 'w');
+                        return false; 
+                    }else if(place[2] === 8){
+                       reallyOutput(output, 'x');
+                        return false; 
+                    }else if(place[2] === 9){
+                       reallyOutput(output, 'y');
+                        return false; 
+                    }
+                }else if(place[1] === 9){
+                    if(place[2] === 5){
+                       reallyOutput(output, 'z');
+                        return false; 
+                    }
+                }
+                
+            }
+            
+        }
+        
+        function reallyOutput(output, newChar){
+            $('#output').html(output + newChar);
+            goToStart();
+        }
+        
+        function goToStart(){
+            $('#slot0').html('space');
+            $('#slot1').html('&nbsp;');
+            $('#slot2').html('&nbsp;');
+            $('#slot3').html('&nbsp;');
+            $('#slot4').html('&nbsp;');
+            place = [];
+        }
+       
+        function sendOutput(){
+            // Eventually the user could choose how to send the text.
+            // Via email, something like email, or say it out loud
+            // which is what this is.
+            var html = $('#output').html().replace(/\u2022/g, ' ');
+            var msg = new SpeechSynthesisUtterance(html);
+            window.speechSynthesis.speak(msg);
+        };
+    </script>
+  </body>
+</html>
